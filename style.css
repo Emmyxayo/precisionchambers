@@ -384,7 +384,33 @@ ul{ list-style:none; margin:0; padding:0; }
 }
 .reveal.is-visible{ opacity:1; transform:translateY(0) rotateX(0); }
 
+/* ---------- WhatsApp floating button ---------- */
+.whatsapp-float{
+  position:fixed; right:22px; bottom:22px; z-index:70;
+  width:58px; height:58px; border-radius:50%;
+  background:#25D366; color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 10px 26px rgba(0,0,0,.35);
+  transition:transform .25s var(--ease), box-shadow .25s var(--ease);
+}
+.whatsapp-float:hover{ transform:translateY(-3px) scale(1.05); box-shadow:0 14px 32px rgba(0,0,0,.42); }
+.whatsapp-float:active{ transform:translateY(0) scale(.97); }
+.whatsapp-float__ring{
+  position:absolute; inset:-6px; border-radius:50%;
+  border:2px solid rgba(37,211,102,.55);
+  animation:wa-pulse 2.4s ease-out infinite;
+}
+@keyframes wa-pulse{
+  0%{ transform:scale(.9); opacity:.8; }
+  70%{ transform:scale(1.35); opacity:0; }
+  100%{ opacity:0; }
+}
+@media (max-width:600px){
+  .whatsapp-float{ right:16px; bottom:16px; width:52px; height:52px; }
+}
+
 @media (prefers-reduced-motion: reduce){
+  .whatsapp-float__ring{ animation:none; }
   html{ scroll-behavior:auto; }
   .reveal{ transition:opacity .4s ease; transform:none !important; }
   .scale-rig, .scale__beam, .blueprint, .hero__bg img{ transition:none !important; transform:none !important; }
