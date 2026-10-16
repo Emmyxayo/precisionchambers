@@ -28,13 +28,42 @@
 
   /* ---------- plumbline scroll progress ---------- */
   var plumbFill = document.getElementById('plumbFill');
-  var scaleRig = document.getElementById('scaleRig');
-  var scaleBeam = document.getElementById('scaleBeam');
   var blueprint = document.querySelector('.blueprint');
-  var heroBgImg = document.querySelector('.hero__bg img');
-  var heroEl = document.querySelector('.hero');
+  var heroSection = document.querySelector('.hero--video');
+  var heroCopy = document.getElementById('heroCopy');
+  var heroVideo = document.getElementById('heroVideo');
 
   function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+
+  /* ---------- hero video: scroll scrubs playback ---------- */
+  var videoReady = false;
+  var videoDuration = 0;
+  if(heroVideo){
+    heroVideo.addEventListener('loadedmetadata', function(){
+      videoDuration = heroVideo.duration || 0;
+      if(reduceMotion){
+        /* respect reduced motion: hold on the poster frame, no autoplay/scrub */
+        heroVideo.pause();
+        heroVideo.currentTime = 0;
+        return;
+      }
+      if(videoDuration){
+        /* "unlock" seeking on mobile Safari, then hand control to scroll */
+        var p = heroVideo.play();
+        if(p && p.then){
+          p.then(function(){ heroVideo.pause(); videoReady = true; }).catch(function(){ videoReady = true; });
+        } else {
+          heroVideo.pause();
+          videoReady = true;
+        }
+      }
+    });
+    if(heroVideo.readyState >= 1){
+      videoDuration = heroVideo.duration || 0;
+      videoReady = !reduceMotion && !!videoDuration;
+      if(videoReady) heroVideo.pause();
+    }
+  }
 
   function onScroll(){
     onHeaderScroll();
@@ -46,24 +75,28 @@
     plumbFill.style.height = pct + '%';
 
     if(!reduceMotion){
-      /* hero-linked 3D scale + blueprint parallax, only while hero is in view */
-      var heroH = heroEl.offsetHeight;
-      var heroProgress = clamp(scrollTop / (heroH * 0.9), 0, 1);
-
-      if(scaleRig){
-        var ry = -18 + heroProgress * 18;      // settles from -18deg to 0deg
-        var rx = 6 - heroProgress * 6;
-        scaleRig.style.transform = 'rotateY(' + ry + 'deg) rotateX(' + rx + 'deg)';
-      }
-      if(scaleBeam){
-        var tilt = -6 + heroProgress * 6;      // beam levels out as you scroll/settle
-        scaleBeam.style.setProperty('--tilt', tilt + 'deg');
-      }
       if(blueprint){
         blueprint.style.transform = 'translateY(' + (scrollTop * 0.08) + 'px)';
       }
-      if(heroBgImg){
-        heroBgImg.style.transform = 'scale(1.08) translateY(' + (scrollTop * 0.04) + 'px)';
+
+      if(heroSection){
+        var heroH = heroSection.offsetHeight;
+        var scrollable = heroH - window.innerHeight;
+        var heroProgress = scrollable > 0 ? clamp(scrollTop / scrollable, 0, 1) : 0;
+
+        /* scrub the bronze-scales footage frame-by-frame with scroll position */
+        if(videoReady && videoDuration){
+          heroVideo.currentTime = heroProgress * videoDuration;
+        }
+
+        /* hero copy eases back and fades slightly as the scale finishes assembling */
+        if(heroCopy){
+          var settleP = clamp((heroProgress - 0.6) / 0.4, 0, 1); // recede over the final 40%
+          var copyOpacity = clamp(1 - settleP * 0.85, 0.15, 1);
+          var copyY = settleP * -36;
+          heroCopy.style.opacity = copyOpacity;
+          heroCopy.style.transform = 'translateY(' + copyY + 'px)';
+        }
       }
     }
   }
