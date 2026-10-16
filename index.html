@@ -12,10 +12,24 @@
 </head>
 <body>
 
-<!-- Progress plumb-line -->
-<div class="plumbline" aria-hidden="true"><div class="plumbline__fill" id="plumbFill"></div></div>
+<!-- Grain texture (fixed, decorative) -->
+<div class="grain" aria-hidden="true"></div>
 
 <a class="skip-link" href="#main">Skip to content</a>
+
+<!-- Scroll rail: section progress + wayfinding -->
+<nav class="rail" id="scrollRail" aria-label="Section progress">
+  <div class="rail__track"><div class="rail__fill" id="railFill"></div></div>
+  <ul class="rail__dots">
+    <li><a href="#top" data-rail="top" aria-label="Top"><span class="rail__tip">Top</span></a></li>
+    <li><a href="#about" data-rail="about" aria-label="About"><span class="rail__tip">About</span></a></li>
+    <li><a href="#services" data-rail="services" aria-label="Practice Areas"><span class="rail__tip">Practice Areas</span></a></li>
+    <li><a href="#why" data-rail="why" aria-label="Why Us"><span class="rail__tip">Why Us</span></a></li>
+    <li><a href="#commitment" data-rail="commitment" aria-label="Commitment"><span class="rail__tip">Commitment</span></a></li>
+    <li><a href="#offices" data-rail="offices" aria-label="Offices"><span class="rail__tip">Offices</span></a></li>
+    <li><a href="#contact" data-rail="contact" aria-label="Contact"><span class="rail__tip">Contact</span></a></li>
+  </ul>
+</nav>
 
 <header class="site-header" id="siteHeader">
   <div class="wrap header__inner">
@@ -35,12 +49,12 @@
         <span class="brand__sub">Legal Practitioners &amp; Real Estate Consultants</span>
       </span>
     </a>
-    <nav class="nav" aria-label="Primary">
-      <a href="#about">About</a>
-      <a href="#services">Practice Areas</a>
-      <a href="#why">Why Us</a>
-      <a href="#offices">Offices</a>
-      <a href="#contact">Contact</a>
+    <nav class="nav" aria-label="Primary" id="primaryNav">
+      <a href="#about" data-nav="about">About</a>
+      <a href="#services" data-nav="services">Practice Areas</a>
+      <a href="#why" data-nav="why">Why Us</a>
+      <a href="#offices" data-nav="offices">Offices</a>
+      <a href="#contact" data-nav="contact">Contact</a>
     </nav>
     <a class="btn btn--ghost header__cta" href="tel:08148454212">Call Now</a>
     <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false">
@@ -189,11 +203,33 @@
     </div>
   </section>
 
+  <!-- BY THE NUMBERS -->
+  <section class="stats" id="stats">
+    <div class="wrap stats__inner">
+      <div class="stat reveal">
+        <span class="stat__num" data-count="6">0</span>
+        <span class="stat__label">Practice Areas<br>under one roof</span>
+      </div>
+      <div class="stat__div" aria-hidden="true"></div>
+      <div class="stat reveal">
+        <span class="stat__num" data-count="2">0</span>
+        <span class="stat__label">Chambers serving<br>Lagos &amp; Ogun State</span>
+      </div>
+      <div class="stat__div" aria-hidden="true"></div>
+      <div class="stat reveal">
+        <span class="stat__num" data-count="7">0</span>
+        <span class="stat__label">Standing commitments<br>to every client</span>
+      </div>
+    </div>
+  </section>
+
   <!-- WHY CHOOSE US -->
   <section class="why" id="why">
     <div class="wrap why__inner">
       <div class="why__photo reveal">
-        <img src="assets/living-warm.jpg" alt="Interior of a modern property represented by the Chambers' real estate practice">
+        <div class="why__photo-mask">
+          <img src="assets/living-warm.jpg" alt="Interior of a modern property represented by the Chambers' real estate practice" data-parallax="0.12">
+        </div>
         <div class="why__photo-frame" aria-hidden="true"></div>
       </div>
       <div class="why__list">
@@ -248,7 +284,7 @@
         <div class="office reveal">
           <span class="office__tag">Head Office</span>
           <p class="office__address">6, Soji Adepegba, Opp GT Bank, Off Allen Avenue, Ikeja, Lagos State.</p>
-          <div class="office__img"><img src="assets/living-tall.jpg" alt=""></div>
+          <div class="office__img"><img src="assets/living-blue.jpg" alt=""></div>
         </div>
         <div class="office reveal">
           <span class="office__tag">Annex</span>

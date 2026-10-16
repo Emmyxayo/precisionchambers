@@ -26,12 +26,13 @@
     });
   });
 
-  /* ---------- plumbline scroll progress ---------- */
-  var plumbFill = document.getElementById('plumbFill');
+  /* ---------- scroll rail progress ---------- */
+  var railFill = document.getElementById('railFill');
   var blueprint = document.querySelector('.blueprint');
   var heroSection = document.querySelector('.hero--video');
   var heroCopy = document.getElementById('heroCopy');
   var heroVideo = document.getElementById('heroVideo');
+  var parallaxEls = Array.prototype.slice.call(document.querySelectorAll('[data-parallax]'));
 
   function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
 
@@ -72,12 +73,22 @@
     var scrollTop = window.scrollY || doc.scrollTop;
     var max = doc.scrollHeight - window.innerHeight;
     var pct = max > 0 ? (scrollTop / max) * 100 : 0;
-    plumbFill.style.height = pct + '%';
+    if(railFill) railFill.style.height = pct + '%';
 
     if(!reduceMotion){
       if(blueprint){
         blueprint.style.transform = 'translateY(' + (scrollTop * 0.08) + 'px)';
       }
+
+      /* parallax: images drift opposite the scroll as they cross the viewport */
+      parallaxEls.forEach(function(img){
+        var rect = img.getBoundingClientRect();
+        if(rect.bottom < -200 || rect.top > window.innerHeight + 200) return; // skip offscreen work
+        var factor = parseFloat(img.getAttribute('data-parallax')) || 0.1;
+        var centerDelta = (rect.top + rect.height / 2) - window.innerHeight / 2;
+        var shift = clamp(centerDelta * factor * -1, -40, 40);
+        img.style.transform = 'translateY(' + (-30 + shift) + 'px)';
+      });
 
       if(heroSection){
         var heroH = heroSection.offsetHeight;
@@ -117,6 +128,54 @@
     revealEls.forEach(function(el){ io.observe(el); });
   } else {
     revealEls.forEach(function(el){ el.classList.add('is-visible'); });
+  }
+
+  /* ---------- section tracking: rail dots + header nav active state ---------- */
+  var railLinks = document.querySelectorAll('.rail__dots a[data-rail]');
+  var navLinks = document.querySelectorAll('#primaryNav a[data-nav]');
+  var trackedSections = Array.prototype.slice.call(
+    document.querySelectorAll('#top, #about, #services, #why, #commitment, #offices, #contact')
+  );
+
+  if('IntersectionObserver' in window && trackedSections.length){
+    var sectionIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(!entry.isIntersecting) return;
+        var id = entry.target.id;
+        railLinks.forEach(function(a){
+          a.classList.toggle('active', a.getAttribute('data-rail') === id);
+        });
+        navLinks.forEach(function(a){
+          a.classList.toggle('active', a.getAttribute('data-nav') === id);
+        });
+      });
+    }, { rootMargin:'-45% 0px -45% 0px', threshold:0 });
+    trackedSections.forEach(function(el){ sectionIO.observe(el); });
+  }
+
+  /* ---------- stat count-up ---------- */
+  var statNums = document.querySelectorAll('.stat__num[data-count]');
+  if(statNums.length && 'IntersectionObserver' in window){
+    var statIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(!entry.isIntersecting) return;
+        var el = entry.target;
+        var target = parseInt(el.getAttribute('data-count'), 10) || 0;
+        statIO.unobserve(el);
+        if(reduceMotion){ el.textContent = target; return; }
+        var start = null;
+        var duration = 1100;
+        function step(ts){
+          if(start === null) start = ts;
+          var p = clamp((ts - start) / duration, 0, 1);
+          var eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
+          el.textContent = Math.round(eased * target);
+          if(p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      });
+    }, { threshold:0.6 });
+    statNums.forEach(function(el){ statIO.observe(el); });
   }
 
   /* ---------- 3D tilt on service cards ---------- */
